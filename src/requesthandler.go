@@ -8,9 +8,9 @@ import (
 	"google.golang.org/api/option"
 )
 
-func InitClient() (*genai.Client, error) {
+func InitClient(token string) (*genai.Client, error) {
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyA_JSJbrNEm0_9pcVQEjNWcpsXzJ8kYclU"))
+	client, err := genai.NewClient(ctx, option.WithAPIKey(token))
 	if err != nil {
 		return nil, err
 	}

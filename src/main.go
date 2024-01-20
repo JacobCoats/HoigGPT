@@ -13,28 +13,39 @@ import (
 )
 
 func init() {
-	flag.StringVar(&token, "t", "", "Bot Token")
+	flag.StringVar(&discordToken, "d", "", "Discord Token")
+	flag.StringVar(&bardToken, "b", "", "Bard Token")
 	flag.Parse()
 
+	if bardToken == "" {
+		fmt.Println("No Bard token provided")
+		return
+	}
+
 	conversations = ConversationHandler{Conversations: make(map[string]*genai.ChatSession)}
-	client, err := InitClient()
+	client, err := InitClient(bardToken)
 	if err != nil {
 		fmt.Println("Error initializing request handler: ", err)
 	}
 	model = client.GenerativeModel("gemini-pro")
 }
 
-var token string
+var discordToken string
+var bardToken string
 var conversations ConversationHandler
 var model *genai.GenerativeModel
 
 func main() {
-	if token == "" {
-		fmt.Println("No token provided")
+	if bardToken == "" {
 		return
 	}
 
-	dg, err := discordgo.New("Bot " + token)
+	if discordToken == "" {
+		fmt.Println("No Discord token provided")
+		return
+	}
+
+	dg, err := discordgo.New("Bot " + discordToken)
 	if err != nil {
 		fmt.Println("Error creating session: ", err)
 		return
@@ -45,6 +56,7 @@ func main() {
 	err = dg.Open()
 	if err != nil {
 		fmt.Println("Error opening session: ", err)
+		return
 	}
 
 	// Create channel to listen for term signal. Quit when ctrl-c is pressed

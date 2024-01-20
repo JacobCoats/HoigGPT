@@ -85,36 +85,5 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	var formattedMessage string
-	// Remove the ping
-	if strings.HasPrefix(m.Content, "<@"+s.State.User.ID+">") {
-		formattedMessageWords := strings.Split(m.Content, " ")[1:]
-		formattedMessage = strings.Join(formattedMessageWords, " ")
-	} else {
-		formattedMessage = m.Content
-	}
-	response, err := GetResponse(conversations.Get(m.Author.ID), formattedMessage)
-	if err != nil {
-		fmt.Println("Error retrieving resonse: ", err)
-	}
-
-	messageReference := discordgo.MessageReference{
-		MessageID: m.ID,
-		ChannelID: m.ChannelID,
-	}
-
-	var responseString string
-	for _, part := range response {
-		partString := fmt.Sprintf("%d", part)
-		partString = partString[15 : len(partString)-1]
-		responseString += partString
-	}
-
-	msgSend := &discordgo.MessageSend{
-		Content:         responseString,
-		Reference:       &messageReference,
-		AllowedMentions: &discordgo.MessageAllowedMentions{RepliedUser: true},
-	}
-
-	s.ChannelMessageSendComplex(m.ChannelID, msgSend)
+	HandleMessage(s, m)
 }

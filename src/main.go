@@ -79,11 +79,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if strings.Contains(m.Content, "<@"+s.State.User.ID+">") {
-		conversations.Add(m.Author.ID, model)
-		conversations.Print(m.Author.ID)
-	} else if m.ReferencedMessage == nil || m.ReferencedMessage.Author.ID != s.State.User.ID {
-		return
+		HandleMessage(s, m)
 	}
-
-	HandleMessage(s, m)
 }

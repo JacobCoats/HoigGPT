@@ -8,6 +8,8 @@ import (
 )
 
 func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+	conversations.Add(m.Author.ID, model)
+
 	// Remove the ping for the query
 	var formattedQuery string
 	if strings.HasPrefix(m.Content, "<@"+s.State.User.ID+">") {

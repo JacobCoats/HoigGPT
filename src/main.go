@@ -32,6 +32,7 @@ func init() {
 
 var discordToken string
 var bardToken string
+var iodinesId string = "1038248029649641583"
 var conversations ConversationHandler
 var model *genai.GenerativeModel
 
@@ -78,7 +79,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.Contains(m.Content, "<@"+s.State.User.ID+">") {
+	// If bot was pinged, replied to, or if sender was Iodine Krause handle the message
+	if strings.Contains(m.Content, "<@"+s.State.User.ID+">") ||
+		m.Author.ID == iodinesId ||
+		(m.ReferencedMessage != nil && m.ReferencedMessage.Author.ID == s.State.User.ID) {
 		HandleMessage(s, m)
 	}
 }

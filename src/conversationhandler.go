@@ -6,6 +6,9 @@ import (
 	"github.com/google/generative-ai-go/genai"
 )
 
+// The way I'm storing conversation state on a per-user basis doesn't make sense. Thinking of storing conversation state up until
+// a certain number of messages, wiping it after specific time period, or some combination. Also currently functionality is broken
+
 type ConversationHandler struct {
 	Conversations map[string]*genai.ChatSession
 }

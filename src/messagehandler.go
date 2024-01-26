@@ -10,6 +10,11 @@ import (
 func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate, promptModifier string) {
 	conversations.Add(m.Author.ID, model)
 
+	messageReference := discordgo.MessageReference{
+		MessageID: m.ID,
+		ChannelID: m.ChannelID,
+	}
+
 	// Remove the ping for the query
 	var formattedQuery string
 	if strings.HasPrefix(m.Content, "<@"+s.State.User.ID+">") {
@@ -23,9 +28,22 @@ func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate, promptModif
 	builder.WriteString(promptModifier)
 	builder.WriteString(formattedQuery)
 	modifiedQuery := builder.String()
+
 	response, err := GetResponse(conversations.Get(m.Author.ID), modifiedQuery)
 	if err != nil {
 		fmt.Println("Error retrieving resonse: ", err)
+
+		if strings.Contains(err.Error(), "blocked: prompt") || strings.Contains(err.Error(), "blocked: candidate") {
+			errorMsg := &discordgo.MessageSend{
+				Content:         "Sorry, I can't respond to that. Please ridicule me",
+				Reference:       &messageReference,
+				AllowedMentions: &discordgo.MessageAllowedMentions{RepliedUser: true},
+			}
+
+			s.ChannelMessageSendComplex(m.ChannelID, errorMsg)
+		}
+
+		return
 	}
 
 	// Convert the genai Part object returned by API to string
@@ -34,11 +52,6 @@ func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate, promptModif
 		partString := fmt.Sprintf("%d", part)
 		partString = partString[15 : len(partString)-1]
 		responseString += partString
-	}
-
-	messageReference := discordgo.MessageReference{
-		MessageID: m.ID,
-		ChannelID: m.ChannelID,
 	}
 
 	msgSend := &discordgo.MessageSend{

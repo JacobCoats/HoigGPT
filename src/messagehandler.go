@@ -18,7 +18,7 @@ func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else {
 		formattedQuery = m.Content
 	}
-	formattedQuery += ". Respond colloqiually"
+	formattedQuery += ". Respond conversationally in the same tone as the query"
 	response, err := GetResponse(conversations.Get(m.Author.ID), formattedQuery)
 	if err != nil {
 		fmt.Println("Error retrieving resonse: ", err)

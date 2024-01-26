@@ -7,7 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate, promptModifier string) {
 	conversations.Add(m.Author.ID, model)
 
 	// Remove the ping for the query
@@ -18,8 +18,12 @@ func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else {
 		formattedQuery = m.Content
 	}
-	formattedQuery += ". Respond conversationally in the same tone as the query"
-	response, err := GetResponse(conversations.Get(m.Author.ID), formattedQuery)
+
+	var builder strings.Builder
+	builder.WriteString(promptModifier)
+	builder.WriteString(formattedQuery)
+	modifiedQuery := builder.String()
+	response, err := GetResponse(conversations.Get(m.Author.ID), modifiedQuery)
 	if err != nil {
 		fmt.Println("Error retrieving resonse: ", err)
 	}

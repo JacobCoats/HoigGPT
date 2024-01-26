@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/generative-ai-go/genai"
@@ -28,11 +29,16 @@ func init() {
 		fmt.Println("Error initializing request handler: ", err)
 	}
 	model = client.GenerativeModel("gemini-pro")
+
+	iodineLimiter = NewRateLimiter(1 * time.Minute)
 }
 
 var discordToken string
 var bardToken string
+
 var iodinesId string = "1038248029649641583"
+var iodineLimiter *RateLimiter
+
 var conversations ConversationHandler
 var model *genai.GenerativeModel
 
@@ -79,10 +85,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// If bot was pinged, replied to, or if sender was Iodine Krause handle the message
+	// If bot was pinged or replied to. If the sender was Iodine Krause,
 	if strings.Contains(m.Content, "<@"+s.State.User.ID+">") ||
-		m.Author.ID == iodinesId ||
 		(m.ReferencedMessage != nil && m.ReferencedMessage.Author.ID == s.State.User.ID) {
-		HandleMessage(s, m)
+		HandleMessage(s, m, "Respond to the following conversationally and in a similar tone: ")
+	} else if m.Author.ID == iodinesId && iodineLimiter.IsAllowed() {
+		HandleMessage(s, m, "Respond to the following conversationally as if I am your worst enemy: ")
 	}
 }

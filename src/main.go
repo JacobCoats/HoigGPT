@@ -30,7 +30,7 @@ func init() {
 	}
 	model = client.GenerativeModel("gemini-pro")
 
-	iodineLimiter = NewRateLimiter(1 * time.Minute)
+	iodineLimiter = NewRateLimiter(1*time.Minute, 5)
 }
 
 var discordToken string

@@ -90,6 +90,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		(m.ReferencedMessage != nil && m.ReferencedMessage.Author.ID == s.State.User.ID) {
 		HandleMessage(s, m, "Respond to the following conversationally and in a similar tone: ")
 	} else if m.Author.ID == iodinesId && iodineLimiter.IsAllowed() {
-		HandleMessage(s, m, "Respond to the following conversationally as if we are acting out a scene and I am your arch nemesis: ")
+		HandleMessage(s, m, "Respond to the following conversationally as if I am a rival AI: ")
 	}
 }

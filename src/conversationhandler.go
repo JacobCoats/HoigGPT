@@ -16,7 +16,8 @@ type ConversationHandler struct {
 	Model        *genai.GenerativeModel
 }
 
-var ConversationDuration = time.Minute * 60
+var ConversationDuration = time.Minute * 1
+var MessageLimit = 8
 
 func NewConversationHandler(model *genai.GenerativeModel) *ConversationHandler {
 	return &ConversationHandler{
@@ -25,8 +26,10 @@ func NewConversationHandler(model *genai.GenerativeModel) *ConversationHandler {
 }
 
 func (c *ConversationHandler) Get() *genai.ChatSession {
-	// If there isn't an existing conversation or it's older than the duration, start a new one
-	if c.Conversation == nil || time.Since(c.StartTime) > ConversationDuration {
+	isConversationStale := time.Since(c.StartTime) > ConversationDuration
+	isConversationOverMessageLimit := len(c.Conversation.History) > MessageLimit
+	// If there isn't an existing conversation, it's older than the max duration, or it's too long, start a new one
+	if c.Conversation == nil || isConversationStale || isConversationOverMessageLimit {
 		c.StartNewSession()
 	}
 

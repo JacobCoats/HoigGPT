@@ -22,13 +22,12 @@ func init() {
 		fmt.Println("No Bard token provided")
 		return
 	}
-
-	conversations = ConversationHandler{Conversations: make(map[string]*genai.ChatSession)}
 	client, err := InitClient(bardToken)
 	if err != nil {
 		fmt.Println("Error initializing request handler: ", err)
 	}
 	model = client.GenerativeModel("gemini-pro")
+	conversations = NewConversationHandler(model)
 
 	iodineLimiter = NewRateLimiter(1*time.Minute, 5)
 }
@@ -39,7 +38,7 @@ var bardToken string
 var iodinesId string = "1038248029649641583"
 var iodineLimiter *RateLimiter
 
-var conversations ConversationHandler
+var conversations *ConversationHandler
 var model *genai.GenerativeModel
 
 func main() {
@@ -80,12 +79,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix(m.Content, "!delete") {
-		conversations.Delete(m.Author.ID)
+	if strings.HasPrefix(m.Content, "!restart") {
+		conversations.StartNewSession()
 		return
 	}
 
-	// If bot was pinged or replied to. If the sender was Iodine Krause,
+	// If bot was pinged or replied to. If the sender was Iodine Krause, respond adversarially
 	if strings.Contains(m.Content, "<@"+s.State.User.ID+">") ||
 		(m.ReferencedMessage != nil && m.ReferencedMessage.Author.ID == s.State.User.ID) {
 		HandleMessage(s, m, "Respond to the following conversationally and in a similar tone: ")

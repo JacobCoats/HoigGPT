@@ -8,8 +8,6 @@ import (
 )
 
 func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate, promptModifier string) {
-	conversations.Add(m.Author.ID, model)
-
 	messageReference := discordgo.MessageReference{
 		MessageID: m.ID,
 		ChannelID: m.ChannelID,
@@ -29,7 +27,7 @@ func HandleMessage(s *discordgo.Session, m *discordgo.MessageCreate, promptModif
 	builder.WriteString(formattedQuery)
 	modifiedQuery := builder.String()
 
-	response, err := GetResponse(conversations.Get(m.Author.ID), modifiedQuery)
+	response, err := GetResponse(conversations.Get(), modifiedQuery)
 	if err != nil {
 		fmt.Println("Error retrieving resonse: ", err)
 

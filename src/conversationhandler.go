@@ -17,7 +17,7 @@ type ConversationHandler struct {
 }
 
 var ConversationDuration = time.Minute * 1
-var MessageLimit = 8
+var MessageLimit = 2
 
 func NewConversationHandler(model *genai.GenerativeModel) *ConversationHandler {
 	return &ConversationHandler{

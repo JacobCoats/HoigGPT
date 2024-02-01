@@ -29,7 +29,7 @@ func init() {
 	model = client.GenerativeModel("gemini-pro")
 	conversations = NewConversationHandler(model)
 
-	iodineLimiter = NewRateLimiter(1*time.Minute, 5)
+	iodineLimiter = NewRateLimiter(1*time.Minute, 3)
 }
 
 var discordToken string
@@ -89,6 +89,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		(m.ReferencedMessage != nil && m.ReferencedMessage.Author.ID == s.State.User.ID) {
 		HandleMessage(s, m, "Respond to the following conversationally and in a similar tone: ")
 	} else if m.Author.ID == iodinesId && iodineLimiter.IsAllowed() {
-		HandleMessage(s, m, "Respond to the following conversationally and concisely as if I am a rival AI: ")
+		HandleMessage(s, m, "Respond to the following in no more than a couple of sentences: ")
 	}
 }
